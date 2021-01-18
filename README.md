@@ -29,7 +29,7 @@ nodemon start
 
 ## Catalogue View
 
-![image](public/catalogue.jpg)
+![image](public/catalogue.png)
 
 ## Freelancer Creation Form
 
@@ -37,7 +37,7 @@ nodemon start
 
 ## Freelancer Porfolio or Image Repository
 
-![image](public/portfolio.png)
+![image](public/portfolio.jpg)
 
 ## Homepage
 
