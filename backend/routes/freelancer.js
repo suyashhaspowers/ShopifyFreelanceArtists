@@ -11,11 +11,15 @@ router.route('/add').post((req, res) => {
     const username = req.body.username;
     const description = req.body.description;
     const price = Number(req.body.price);
+    const profilePhotoUrl = req.body.profilePhotoUrl;
+    const repositoryPhotoUrlArray = req.body.repositoryPhotoUrlArray;
 
     const newFreelancer = new Freelancer({
         username,
         description,
-        price
+        price,
+        profilePhotoUrl,
+        repositoryPhotoUrlArray
     });
 
     newFreelancer.save()
@@ -41,6 +45,8 @@ router.route('/update/:id').post((req, res) => {
             freelancer.username = req.body.username;
             freelancer.description = req.body.description;
             freelancer.price = Number(req.bod.price);
+            freelancer.profilePhotoUrl = req.body.profilePhotoUrl;
+            freelancer.repositoryPhotoUrlArray = req.body.repositoryPhotoUrlArray;
             
             freelancer.save()
                 .then(() => res.json('Freelancer updated!'))

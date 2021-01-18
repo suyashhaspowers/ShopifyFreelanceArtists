@@ -1,26 +1,23 @@
 import React, { Component } from 'react';
+import {Navbar, Nav, Button} from 'react-bootstrap'
 import { Link } from 'react-router-dom';
 
-export default class Navbar extends Component {
+export default class TopNavbar extends Component {
 
   render() {
     return (
-      <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-        <Link to="/" className="navbar-brand">Shopify - FreelanceMe</Link>
-        <div className="collpase navbar-collapse">
-        <ul className="navbar-nav mr-auto">
-        <li className="navbar-item">
-          <Link to="/" className="nav-link">Find Freelancer</Link>
-          </li>
-          <li className="navbar-item">
-          <Link to="/create" className="nav-link">Create Freelancer</Link>
-          </li>
-          <li className="navbar-item">
-          <Link to="/user" className="nav-link">Create User</Link>
-          </li>
-        </ul>
+      <Navbar bg="primary" variant="dark">
+        <div className="container">
+          <Navbar.Brand href="/home">Shopify - FreelanceMe</Navbar.Brand>
+          <Nav className="mr-auto">
+            <Nav.Link href="/view">Find Freelancer</Nav.Link>
+            <Nav.Link href="/create">Create Freelancer Profile</Nav.Link>
+          </Nav>
+          <Nav className="ml-auto">
+            <Button href="/user" variant="light">+</Button>
+          </Nav>
         </div>
-      </nav>
+      </Navbar>
     );
   }
 }

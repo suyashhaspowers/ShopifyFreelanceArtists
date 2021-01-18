@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
+import ImageUploader from 'react-images-upload';
 
 
 export default class CreateFreelancer extends Component {
@@ -9,6 +9,9 @@ export default class CreateFreelancer extends Component {
         super(props);
 
         this.onChangeUsername = this.onChangeUsername.bind(this);
+        this.onProfileUpload = this.onProfileUpload.bind(this);
+        this.uploadCloudinary = this.uploadCloudinary.bind(this);
+        this.onPortfolioUpload = this.onPortfolioUpload.bind(this);
         this.onChangeDescription = this.onChangeDescription.bind(this);
         this.onChangePrice = this.onChangePrice.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -17,7 +20,11 @@ export default class CreateFreelancer extends Component {
             username: '',
             description: '',
             price: 0,
-            users: []
+            users: [],
+            profileURL: "",
+            profileFile: '',
+            repositoryFiles: [],
+            repositoryURL: [],
         }
     }
 
@@ -55,27 +62,96 @@ export default class CreateFreelancer extends Component {
         });
     }
 
-    onSubmit(e) {
-        e.preventDefault();
+    onProfileUpload(pictureFile, pictureDataURLs) {
+      console.log(pictureDataURLs);
+      this.setState({
+          profileFile: pictureFile
+      });
+  }
 
-        const freelancer = {
-            username: this.state.username,
-            description: this.state.description,
-            price: this.state.price,
+  onPortfolioUpload(pictureFile, pictureDataURLs) {
+    const repo = this.state.repositoryFiles.slice()
+    repo.push(pictureFile);
+    this.setState({
+      repositoryFiles: repo,
+    });
+  }
+
+  async uploadCloudinary(pictureFiles, isRepo) {
+    if (!Array.isArray(pictureFiles)) {
+      pictureFiles = [pictureFiles];
+    }
+    for (const pictureIndex in pictureFiles) {
+      const imageData = new FormData();
+      imageData.append('file', pictureFiles[pictureIndex])
+      imageData.append('upload_preset', 'freelanceMe');
+
+      const res = await axios.post('https://api.cloudinary.com/v1_1/dxokwzig6/image/upload', imageData)
+      .then((response) => {
+        console.log(response);
+        if (isRepo) {
+          this.setState({
+            repositoryURL: [...this.state.repositoryURL, response.data.url]
+          });
+        } else {
+          this.setState({
+            profileURL: response.data.url,
+          })
         }
 
-        console.log(freelancer);
+      }, (error) => {
+        console.log(error);
+      });
 
-        axios.post('http://localhost:5000/freelancer/add', freelancer)
-            .then(res => console.log(res.data));
-
-        window.location = '/';
     }
+  }
+
+    async onSubmit(e) {
+      e.preventDefault();
+
+      // Upload Profile Photo
+      await this.uploadCloudinary(this.state.profileFile, false);
+
+      // Upload Repo Photo(s)
+      const totalLength = this.state.repositoryFiles.length;
+      await this.uploadCloudinary(this.state.repositoryFiles[totalLength-1], true);
+
+      const freelancer = {
+          username: this.state.username,
+          description: this.state.description,
+          price: this.state.price,
+          profilePhotoUrl: this.state.profileURL,
+          repositoryPhotoUrlArray: this.state.repositoryURL,
+      }
+
+      console.log(freelancer);
+
+      axios.post('http://localhost:5000/freelancer/add', freelancer)
+          .then(res => console.log(res.data));
+
+      window.location = '/';
+    }
+
     render() {
+      console.log(this.state);
         return (
             <div>
       <h3>Register as a Freelancer</h3>
+      <p><i>Create your freelance profile where you can describe your work and pricing.</i></p>
       <form onSubmit={this.onSubmit}>
+        <div className="form-group">
+          <label>Profile Photo:</label>
+          <div style={{border: "black", borderStyle: "solid", borderWidth: "3px"}}>
+            <ImageUploader
+                  withIcon={true}
+                  buttonText='Choose Image'
+                  onChange={this.onProfileUpload}
+                  singleImage={true}
+                  imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                  maxFileSize={5242880}
+              />
+            </div>
+        </div>
         <div className="form-group"> 
           <label>Username: </label>
           <select ref="userInput"
@@ -101,6 +177,19 @@ export default class CreateFreelancer extends Component {
               value={this.state.description}
               onChange={this.onChangeDescription}
               />
+        </div>
+        <div className="form-group">
+          <label>Repository</label>
+          <p><i>Add portfolio pictures here:</i></p>
+          <div style={{border: "black", borderStyle: "solid"}}>
+            <ImageUploader
+                withIcon={true}
+                buttonText='Choose Image(s)'
+                onChange={this.onPortfolioUpload}
+                imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                maxFileSize={5242880}
+            />
+            </div>
         </div>
         <div className="form-group">
           <label>Price ($): </label>

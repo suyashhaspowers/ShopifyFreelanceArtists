@@ -1,0 +1,12 @@
+.profile-image {
+    width: 100px;
+    height: 100px;
+}
+
+.jumbotron {
+    background-image: url("https://i.ibb.co/QJjxgSH/uploads-card-image-561971-fdb87402-4d64-44ae-959b-cd1b89bbb43b-jpg-950x534-filters-quality-80.png");
+    background-size: 1300px 600px;
+    background-position: center;
+    background-color: black;
+    color: white;
+}
